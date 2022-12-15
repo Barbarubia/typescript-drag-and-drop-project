@@ -1,4 +1,22 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+// autobind decorator
+function autobind(_target, _methodName, descriptor) {
+    const originalMethod = descriptor.value;
+    const adjustedDescriptor = {
+        configurable: true,
+        get() {
+            const boundFunction = originalMethod.bind(this);
+            return boundFunction;
+        }
+    };
+    return adjustedDescriptor;
+}
 // Step 1: voglio rendere il form visibile spostando il form incluso nel tag template con id "project-input" all'interno del tag div con id "app"
 class ProjectForm {
     constructor() {
@@ -15,20 +33,23 @@ class ProjectForm {
         this.configure();
         this.attach();
     }
-    // al submit del form (vedi funzione configure) stampo in console i dati immessi dall'utente
+    // al submit del form (vedi funzione configure) stampo in console i dati immessi dall'utente. Uso il decorator autobind
     submitHandler(event) {
         event.preventDefault();
         console.log("Titolo: " + this.titleInputElement.value);
         console.log("Descrizione: " + this.descriptionInputElement.value);
         console.log("Persone: " + this.peopleInputElement.value);
     }
-    // funzione che esegue la funzione submitHandler al submit del form. Uso il metodo bind per poter creare una catena di funzioni preimpostando l'oggetto this.
+    // funzione che esegue la funzione submitHandler al submit del form
     configure() {
-        this.element.addEventListener("submit", this.submitHandler.bind(this));
+        this.element.addEventListener("submit", this.submitHandler);
     }
     // funzione che "attacca" il form (this.element) dopo l'inizio (afterbegin) del tag div con id "app" (this.hostElement)
     attach() {
         this.hostElement.insertAdjacentElement("afterbegin", this.element);
     }
 }
+__decorate([
+    autobind
+], ProjectForm.prototype, "submitHandler", null);
 const showProjectForm = new ProjectForm();

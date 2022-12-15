@@ -1,5 +1,21 @@
-// Step 1: voglio rendere il form visibile spostando il form incluso nel tag template con id "project-input" all'interno del tag div con id "app"
+// autobind decorator
+function autobind(
+  _target: any,
+  _methodName: string,
+  descriptor: PropertyDescriptor
+) {
+  const originalMethod = descriptor.value;
+  const adjustedDescriptor: PropertyDescriptor = {
+    configurable: true,
+    get() {
+      const boundFunction = originalMethod.bind(this);
+      return boundFunction;
+    }
+  };
+  return adjustedDescriptor;
+}
 
+// Step 1: voglio rendere il form visibile spostando il form incluso nel tag template con id "project-input" all'interno del tag div con id "app"
 class ProjectForm {
   templateElement: HTMLTemplateElement; // L'elemento DOM che contiene il form non visibile è un elemento di tipo HTML con tag template
   hostElement: HTMLDivElement; // L'elemento DOM dove voglio mostrare il form è un elemento di tipo HTML con tag div
@@ -23,16 +39,23 @@ class ProjectForm {
     this.element.id = "user-input"; // assegno l'id "user-input" all'elemento contenente il form per definire lo stile
 
     // seleziono tutti i campi del form
-    this.titleInputElement = this.element.querySelector("#title") as HTMLInputElement;
-    this.descriptionInputElement = this.element.querySelector("#description") as HTMLInputElement;
-    this.peopleInputElement = this.element.querySelector("#people") as HTMLInputElement;
+    this.titleInputElement = this.element.querySelector(
+      "#title"
+    ) as HTMLInputElement;
+    this.descriptionInputElement = this.element.querySelector(
+      "#description"
+    ) as HTMLInputElement;
+    this.peopleInputElement = this.element.querySelector(
+      "#people"
+    ) as HTMLInputElement;
 
     this.configure();
 
     this.attach();
   }
 
-  // al submit del form (vedi funzione configure) stampo in console i dati immessi dall'utente
+  // al submit del form (vedi funzione configure) stampo in console i dati immessi dall'utente. Uso il decorator autobind
+  @autobind
   private submitHandler(event: Event) {
     event.preventDefault();
     console.log("Titolo: " + this.titleInputElement.value);
@@ -40,9 +63,9 @@ class ProjectForm {
     console.log("Persone: " + this.peopleInputElement.value);
   }
 
-  // funzione che esegue la funzione submitHandler al submit del form. Uso il metodo bind per poter creare una catena di funzioni preimpostando l'oggetto this.
+  // funzione che esegue la funzione submitHandler al submit del form
   private configure() {
-    this.element.addEventListener("submit", this.submitHandler.bind(this));
+    this.element.addEventListener("submit", this.submitHandler);
   }
 
   // funzione che "attacca" il form (this.element) dopo l'inizio (afterbegin) del tag div con id "app" (this.hostElement)
