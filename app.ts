@@ -13,16 +13,30 @@ function validate(validatableInput: Validatable) {
   if (validatableInput.required) {
     isValid = isValid && validatableInput.value.toString().trim().length !== 0;
   }
-  if (validatableInput.minLength != null && typeof validatableInput.value === "string") {
-    isValid = isValid && validatableInput.value.length > validatableInput.minLength;
+  if (
+    validatableInput.minLength != null &&
+    typeof validatableInput.value === "string"
+  ) {
+    isValid =
+      isValid && validatableInput.value.length > validatableInput.minLength;
   }
-  if (validatableInput.maxLength != null && typeof validatableInput.value === "string") {
-    isValid = isValid && validatableInput.value.length < validatableInput.maxLength;
+  if (
+    validatableInput.maxLength != null &&
+    typeof validatableInput.value === "string"
+  ) {
+    isValid =
+      isValid && validatableInput.value.length < validatableInput.maxLength;
   }
-  if (validatableInput.min != null && typeof validatableInput.value === "number") {
+  if (
+    validatableInput.min != null &&
+    typeof validatableInput.value === "number"
+  ) {
     isValid = isValid && validatableInput.value >= validatableInput.min;
   }
-  if (validatableInput.max != null && typeof validatableInput.value === "number") {
+  if (
+    validatableInput.max != null &&
+    typeof validatableInput.value === "number"
+  ) {
     isValid = isValid && validatableInput.value <= validatableInput.max;
   }
   return isValid;
@@ -93,7 +107,7 @@ class ProjectForm {
     // validazione degli input usando l'interface Validatable
     const titleValidatable: Validatable = {
       value: enteredTitle,
-      required: true
+      required: true,
     };
     const descriptionValidatable: Validatable = {
       value: enteredDescription,
@@ -150,3 +164,41 @@ class ProjectForm {
 }
 
 const showProjectForm = new ProjectForm();
+
+// Step 2: Visualizzare liste dei progetti in corso e dei progetti terminati
+class ProjectsList {
+  templateElement: HTMLTemplateElement;
+  hostElement: HTMLDivElement;
+  element: HTMLElement;
+
+  // Definisco il costruttore tenendo conto che avrò 2 tipo di liste: una per i progetti in corso (active-projects) e una per i progetti terminati (finished-projects)
+  constructor(private type: "active" | "finished") {
+    this.templateElement = document.getElementById(
+      "projects-list"
+    )! as HTMLTemplateElement;
+    this.hostElement = document.getElementById("app")! as HTMLDivElement;
+    const importedNode = document.importNode(
+      this.templateElement.content,
+      true
+    );
+    this.element = importedNode.firstElementChild as HTMLElement;
+    this.element.id = `${this.type}-projects`;
+
+    this.attach();
+    this.renderContent();
+  }
+
+  private renderContent() {
+    const listId = `${this.type}-projects-list`;
+    this.element.querySelector("h2")!.textContent =
+      this.type.toUpperCase() + " PROJECTS";
+    this.element.querySelector("ul")!.id = listId;
+  }
+
+  private attach() {
+    this.hostElement.insertAdjacentElement("beforeend", this.element);
+  }
+}
+
+const activeProjectsList = new ProjectsList("active");
+const finishedProjectsList = new ProjectsList("finished");
