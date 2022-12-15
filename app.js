@@ -13,7 +13,7 @@ function autobind(_target, _methodName, descriptor) {
         get() {
             const boundFunction = originalMethod.bind(this);
             return boundFunction;
-        }
+        },
     };
     return adjustedDescriptor;
 }
@@ -33,12 +33,37 @@ class ProjectForm {
         this.configure();
         this.attach();
     }
-    // al submit del form (vedi funzione configure) stampo in console i dati immessi dall'utente. Uso il decorator autobind
+    // funzione che, se i dati immessi sono corretti, ritorna un elemento di tipo tuple: un array di X elementi in cui ogni elemento è di un tipo definito
+    gatherUserInput() {
+        const enteredTitle = this.titleInputElement.value;
+        const enteredDescription = this.descriptionInputElement.value;
+        const enteredPeople = this.peopleInputElement.value;
+        // validazione degli input
+        if (enteredTitle.trim().length === 0 ||
+            enteredDescription.trim().length === 0 ||
+            enteredPeople.trim().length === 0) {
+            alert("Dati non validi, prova di nuovo");
+            return;
+        }
+        else {
+            return [enteredTitle, enteredDescription, +enteredPeople];
+        }
+    }
+    // funzione che ripulisce il form
+    clearInputs() {
+        this.titleInputElement.value = "";
+        this.descriptionInputElement.value = "";
+        this.peopleInputElement.value = "";
+    }
+    // al submit del form (vedi funzione configure) eseguo la funzione gatherUserInput. Uso il decorator autobind
     submitHandler(event) {
         event.preventDefault();
-        console.log("Titolo: " + this.titleInputElement.value);
-        console.log("Descrizione: " + this.descriptionInputElement.value);
-        console.log("Persone: " + this.peopleInputElement.value);
+        const userInput = this.gatherUserInput();
+        if (Array.isArray(userInput)) {
+            const [title, desc, people] = userInput;
+            console.log(title, desc, people);
+            this.clearInputs();
+        }
     }
     // funzione che esegue la funzione submitHandler al submit del form
     configure() {
