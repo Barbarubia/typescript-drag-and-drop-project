@@ -10,7 +10,7 @@ class Project {
     public title: string,
     public description: string,
     public people: number,
-    public status: ProjectStatus,
+    public status: ProjectStatus
   ) {}
 }
 
@@ -243,7 +243,15 @@ class ProjectsList {
     this.element.id = `${this.type}-projects`;
 
     projectState.addListener((projects: Project[]) => {
-      this.assignedProjects = projects;
+      // filtro i progetti in base al loro status active o finished
+      const relevantProjects = projects.filter((project) => {
+        if (this.type === "active") {
+          return project.status === ProjectStatus.Active;
+        }
+        return project.status === ProjectStatus.Finished;
+      });
+
+      this.assignedProjects = relevantProjects;
       this.renderProjects();
     });
 
