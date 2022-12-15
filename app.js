@@ -7,6 +7,7 @@ class ProjectForm {
         // uso il metodo importNode per importare il contenuto (.content) dell'elemento template selezionato. Il secondo argomento "true" dichiara che voglio importare tutti gli elementi discendenti.
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
+        this.element.id = "user-input"; // assegno l'id "user-input" all'elemento contenente il form per definire lo stile
         this.attach();
     }
     attach() {

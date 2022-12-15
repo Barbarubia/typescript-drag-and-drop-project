@@ -17,6 +17,7 @@ class ProjectForm {
       true
     );
     this.element = importedNode.firstElementChild as HTMLFormElement;
+    this.element.id = "user-input"; // assegno l'id "user-input" all'elemento contenente il form per definire lo stile
     this.attach();
   }
 
