@@ -1,3 +1,15 @@
+// Drag & Drop Interfaces
+interface Draggable {
+  dragStartHandler(event: DragEvent): void;
+  dragEndHandler(event: DragEvent): void;
+}
+
+interface DragTarget {
+  dragOverHandler(event: DragEvent): void;
+  dropHandler(event: DragEvent): void;
+  dragLeaveHandler(event: DragEvent): void;
+}
+
 // Project Type
 enum ProjectStatus {
   Active,
@@ -50,6 +62,18 @@ class ProjectState extends State<Project> {
       ProjectStatus.Active
     );
     this.projects.push(newProject);
+    this.updateListeners();
+  }
+
+  moveProject(projectId: string, newStatus: ProjectStatus) {
+    const projectToMove = this.projects.find((project) => project.id === projectId);
+    if (projectToMove && projectToMove.status !== newStatus) {
+      projectToMove.status = newStatus;
+      this.updateListeners();
+    }
+  }
+
+  private updateListeners() {
     for (const listenerFunction of this.listeners) {
       listenerFunction(this.projects.slice());
     }
@@ -248,7 +272,10 @@ class ProjectForm extends BaseComponent<HTMLDivElement, HTMLFormElement> {
 const showProjectForm = new ProjectForm();
 
 // Visualizzare liste dei progetti in corso e dei progetti terminati
-class ProjectsList extends BaseComponent<HTMLDivElement, HTMLElement> {
+class ProjectsList
+  extends BaseComponent<HTMLDivElement, HTMLElement>
+  implements DragTarget
+{
   assignedProjects: Project[];
 
   get projectStatus() {
@@ -268,6 +295,32 @@ class ProjectsList extends BaseComponent<HTMLDivElement, HTMLElement> {
     this.renderContent();
   }
 
+  @autobind
+  dragOverHandler(event: DragEvent) {
+    if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
+      event.preventDefault();
+      // modifico l'aspetto dell'area dove posso spostare gli elementi "draggati"
+      const listEl = this.element.querySelector("ul")!;
+      listEl.classList.add("droppable");
+    }
+  }
+
+  @autobind
+  dropHandler(event: DragEvent) {
+    const projectId = event.dataTransfer!.getData("text/plain");
+    projectState.moveProject(
+      projectId,
+      this.type === "active" ? ProjectStatus.Active : ProjectStatus.Finished
+    );
+  }
+
+  @autobind
+  dragLeaveHandler(_event: DragEvent) {
+    // ripristino l'aspetto dell'area dove posso spostare gli elementi "draggati"
+    const listEl = this.element.querySelector("ul")!;
+    listEl.classList.remove("droppable");
+  }
+
   private renderProjects() {
     const listEl = document.getElementById(
       `${this.type}-projects-list`
@@ -279,6 +332,9 @@ class ProjectsList extends BaseComponent<HTMLDivElement, HTMLElement> {
   }
 
   configure() {
+    this.element.addEventListener("dragover", this.dragOverHandler);
+    this.element.addEventListener("dragleave", this.dragLeaveHandler);
+    this.element.addEventListener("drop", this.dropHandler);
     projectState.addListener((projects: Project[]) => {
       // filtro i progetti in base al loro status active o finished
       const relevantProjects = projects.filter((project) => {
@@ -305,7 +361,10 @@ const activeProjectsList = new ProjectsList("active");
 const finishedProjectsList = new ProjectsList("finished");
 
 // ProjectItem Class
-class ProjectItem extends BaseComponent<HTMLUListElement, HTMLLIElement> {
+class ProjectItem
+  extends BaseComponent<HTMLUListElement, HTMLLIElement>
+  implements Draggable
+{
   private project: Project;
 
   get persons() {
@@ -317,18 +376,31 @@ class ProjectItem extends BaseComponent<HTMLUListElement, HTMLLIElement> {
   }
 
   constructor(hostId: string, project: Project) {
-    super("single-project", hostId, false, project.id );
+    super("single-project", hostId, false, project.id);
     this.project = project;
 
     this.configure();
     this.renderContent();
   }
 
-  configure() {}
+  @autobind
+  dragStartHandler(event: DragEvent) {
+    event.dataTransfer!.setData("text/plain", this.project.id);
+    event.dataTransfer!.effectAllowed = "move";
+  }
+
+  dragEndHandler(_event: DragEvent) {
+    console.log("DragEnd");
+  }
+
+  configure() {
+    this.element.addEventListener("dragstart", this.dragStartHandler);
+    this.element.addEventListener("dragend", this.dragEndHandler);
+  }
 
   renderContent() {
-    this.element.querySelector('h2')!.textContent = this.project.title;
-    this.element.querySelector('h3')!.textContent = this.persons;
-    this.element.querySelector('p')!.textContent = this.project.description;
+    this.element.querySelector("h2")!.textContent = this.project.title;
+    this.element.querySelector("h3")!.textContent = this.persons;
+    this.element.querySelector("p")!.textContent = this.project.description;
   }
 }
