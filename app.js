@@ -171,6 +171,14 @@ __decorate([
 const showProjectForm = new ProjectForm();
 // Visualizzare liste dei progetti in corso e dei progetti terminati
 class ProjectsList extends BaseComponent {
+    get projectStatus() {
+        if (this.type === "active") {
+            return "IN CORSO";
+        }
+        else {
+            return "TERMINATI";
+        }
+    }
     // Definisco il costruttore tenendo conto che avrò 2 tipo di liste: una per i progetti in corso (active-projects) e una per i progetti terminati (finished-projects)
     constructor(type) {
         super("projects-list", "app", false, `${type}-projects`); // si usa per richiamare il constructor della classe ereditata
@@ -183,9 +191,7 @@ class ProjectsList extends BaseComponent {
         const listEl = document.getElementById(`${this.type}-projects-list`);
         listEl.innerHTML = "";
         for (const projectItem of this.assignedProjects) {
-            const listItem = document.createElement("li");
-            listItem.textContent = projectItem.title;
-            listEl.appendChild(listItem);
+            new ProjectItem(this.element.querySelector("ul").id, projectItem);
         }
     }
     configure() {
@@ -204,9 +210,32 @@ class ProjectsList extends BaseComponent {
     renderContent() {
         const listId = `${this.type}-projects-list`;
         this.element.querySelector("h2").textContent =
-            this.type.toUpperCase() + " PROJECTS";
+            "PROGETTI " + this.projectStatus;
         this.element.querySelector("ul").id = listId;
     }
 }
 const activeProjectsList = new ProjectsList("active");
 const finishedProjectsList = new ProjectsList("finished");
+// ProjectItem Class
+class ProjectItem extends BaseComponent {
+    get persons() {
+        if (this.project.people === 1) {
+            return "1 persona assegnata";
+        }
+        else {
+            return `${this.project.people} persone assegnate`;
+        }
+    }
+    constructor(hostId, project) {
+        super("single-project", hostId, false, project.id);
+        this.project = project;
+        this.configure();
+        this.renderContent();
+    }
+    configure() { }
+    renderContent() {
+        this.element.querySelector('h2').textContent = this.project.title;
+        this.element.querySelector('h3').textContent = this.persons;
+        this.element.querySelector('p').textContent = this.project.description;
+    }
+}
