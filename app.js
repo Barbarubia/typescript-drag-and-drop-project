@@ -31,7 +31,6 @@ class State {
 class ProjectState extends State {
     constructor() {
         super();
-        // private listeners: Listener[] = [];
         this.projects = [];
     }
     static getInstance() {
@@ -41,9 +40,6 @@ class ProjectState extends State {
         this.instance = new ProjectState();
         return this.instance;
     }
-    // addListener(listenerFunction: Listener) {
-    //   this.listeners.push(listenerFunction);
-    // }
     addProject(title, description, numOfPeople) {
         const newProject = new Project(Math.random().toString(), title, description, numOfPeople, ProjectStatus.Active);
         this.projects.push(newProject);
@@ -110,23 +106,11 @@ class BaseComponent {
 class ProjectForm extends BaseComponent {
     constructor() {
         super("project-input", "app", true, "user-input"); // si usa per richiamare il constructor della classe ereditata
-        // this.templateElement = document.getElementById(
-        //   "project-input"
-        // )! as HTMLTemplateElement; // seleziono l'elemento template con tag "project-input"
-        // this.hostElement = document.getElementById("app")! as HTMLDivElement; // seleziono l'elemento div con tag "app"
-        // // uso il metodo importNode per importare il contenuto (.content) dell'elemento template selezionato. Il secondo argomento "true" dichiara che voglio importare tutti gli elementi discendenti.
-        // const importedNode = document.importNode(
-        //   this.templateElement.content,
-        //   true
-        // );
-        // this.element = importedNode.firstElementChild as HTMLFormElement;
-        // this.element.id = "user-input"; // assegno l'id "user-input" all'elemento contenente il form per definire lo stile
         // seleziono tutti i campi del form
         this.titleInputElement = this.element.querySelector("#title");
         this.descriptionInputElement = this.element.querySelector("#description");
         this.peopleInputElement = this.element.querySelector("#people");
         this.configure();
-        // this.attach();
     }
     // funzione che, se i dati immessi sono corretti, ritorna un elemento di tipo tuple: un array di X elementi in cui ogni elemento è di un tipo definito
     gatherUserInput() {
@@ -179,7 +163,7 @@ class ProjectForm extends BaseComponent {
     configure() {
         this.element.addEventListener("submit", this.submitHandler);
     }
-    renderContent() { }
+    renderContent() { } // in questa classe non serve, ma la instanzio vuota per evitare errore in quanto dichiarata nella classe ereditata
 }
 __decorate([
     autobind
@@ -191,29 +175,7 @@ class ProjectsList extends BaseComponent {
     constructor(type) {
         super("projects-list", "app", false, `${type}-projects`); // si usa per richiamare il constructor della classe ereditata
         this.type = type;
-        // this.templateElement = document.getElementById(
-        //   "projects-list"
-        // )! as HTMLTemplateElement;
-        // this.hostElement = document.getElementById("app")! as HTMLDivElement;
         this.assignedProjects = [];
-        // const importedNode = document.importNode(
-        //   this.templateElement.content,
-        //   true
-        // );
-        // this.element = importedNode.firstElementChild as HTMLElement;
-        // this.element.id = `${this.type}-projects`;
-        // projectState.addListener((projects: Project[]) => {
-        //   // filtro i progetti in base al loro status active o finished
-        //   const relevantProjects = projects.filter((project) => {
-        //     if (this.type === "active") {
-        //       return project.status === ProjectStatus.Active;
-        //     }
-        //     return project.status === ProjectStatus.Finished;
-        //   });
-        //   this.assignedProjects = relevantProjects;
-        //   this.renderProjects();
-        // });
-        // this.attach();
         this.configure();
         this.renderContent();
     }

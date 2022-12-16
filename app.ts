@@ -26,7 +26,6 @@ class State<T> {
 }
 
 class ProjectState extends State<Project> {
-  // private listeners: Listener[] = [];
   private projects: Project[] = [];
   private static instance: ProjectState;
 
@@ -41,10 +40,6 @@ class ProjectState extends State<Project> {
     this.instance = new ProjectState();
     return this.instance;
   }
-
-  // addListener(listenerFunction: Listener) {
-  //   this.listeners.push(listenerFunction);
-  // }
 
   addProject(title: string, description: string, numOfPeople: number) {
     const newProject = new Project(
@@ -167,27 +162,12 @@ abstract class BaseComponent<T extends HTMLElement, U extends HTMLElement> {
 
 // Rendere il form visibile spostando il form incluso nel tag template con id "project-input" all'interno del tag div con id "app"
 class ProjectForm extends BaseComponent<HTMLDivElement, HTMLFormElement> {
-  // templateElement: HTMLTemplateElement; // L'elemento DOM che contiene il form non visibile è un elemento di tipo HTML con tag template
-  // hostElement: HTMLDivElement; // L'elemento DOM dove voglio mostrare il form è un elemento di tipo HTML con tag div
-  // element: HTMLFormElement;
   titleInputElement: HTMLInputElement;
   descriptionInputElement: HTMLInputElement;
   peopleInputElement: HTMLInputElement;
 
   constructor() {
     super("project-input", "app", true, "user-input"); // si usa per richiamare il constructor della classe ereditata
-    // this.templateElement = document.getElementById(
-    //   "project-input"
-    // )! as HTMLTemplateElement; // seleziono l'elemento template con tag "project-input"
-    // this.hostElement = document.getElementById("app")! as HTMLDivElement; // seleziono l'elemento div con tag "app"
-
-    // // uso il metodo importNode per importare il contenuto (.content) dell'elemento template selezionato. Il secondo argomento "true" dichiara che voglio importare tutti gli elementi discendenti.
-    // const importedNode = document.importNode(
-    //   this.templateElement.content,
-    //   true
-    // );
-    // this.element = importedNode.firstElementChild as HTMLFormElement;
-    // this.element.id = "user-input"; // assegno l'id "user-input" all'elemento contenente il form per definire lo stile
 
     // seleziono tutti i campi del form
     this.titleInputElement = this.element.querySelector(
@@ -201,8 +181,6 @@ class ProjectForm extends BaseComponent<HTMLDivElement, HTMLFormElement> {
     ) as HTMLInputElement;
 
     this.configure();
-
-    // this.attach();
   }
 
   // funzione che, se i dati immessi sono corretti, ritorna un elemento di tipo tuple: un array di X elementi in cui ogni elemento è di un tipo definito
@@ -264,53 +242,20 @@ class ProjectForm extends BaseComponent<HTMLDivElement, HTMLFormElement> {
     this.element.addEventListener("submit", this.submitHandler);
   }
 
-  renderContent() {}
-
-  // funzione che "attacca" il form (this.element) dopo l'inizio (afterbegin) del tag div con id "app" (this.hostElement)
-  // private attach() {
-  //   this.hostElement.insertAdjacentElement("afterbegin", this.element);
-  // }
+  renderContent() {} // in questa classe non serve, ma la instanzio vuota per evitare errore in quanto dichiarata nella classe ereditata
 }
 
 const showProjectForm = new ProjectForm();
 
 // Visualizzare liste dei progetti in corso e dei progetti terminati
 class ProjectsList extends BaseComponent<HTMLDivElement, HTMLElement> {
-  // templateElement: HTMLTemplateElement;
-  // hostElement: HTMLDivElement;
-  // element: HTMLElement;
   assignedProjects: Project[];
 
   // Definisco il costruttore tenendo conto che avrò 2 tipo di liste: una per i progetti in corso (active-projects) e una per i progetti terminati (finished-projects)
   constructor(private type: "active" | "finished") {
     super("projects-list", "app", false, `${type}-projects`); // si usa per richiamare il constructor della classe ereditata
-    // this.templateElement = document.getElementById(
-    //   "projects-list"
-    // )! as HTMLTemplateElement;
-    // this.hostElement = document.getElementById("app")! as HTMLDivElement;
     this.assignedProjects = [];
 
-    // const importedNode = document.importNode(
-    //   this.templateElement.content,
-    //   true
-    // );
-    // this.element = importedNode.firstElementChild as HTMLElement;
-    // this.element.id = `${this.type}-projects`;
-
-    // projectState.addListener((projects: Project[]) => {
-    //   // filtro i progetti in base al loro status active o finished
-    //   const relevantProjects = projects.filter((project) => {
-    //     if (this.type === "active") {
-    //       return project.status === ProjectStatus.Active;
-    //     }
-    //     return project.status === ProjectStatus.Finished;
-    //   });
-
-    //   this.assignedProjects = relevantProjects;
-    //   this.renderProjects();
-    // });
-
-    // this.attach();
     this.configure();
     this.renderContent();
   }
@@ -348,10 +293,6 @@ class ProjectsList extends BaseComponent<HTMLDivElement, HTMLElement> {
       this.type.toUpperCase() + " PROJECTS";
     this.element.querySelector("ul")!.id = listId;
   }
-
-  // private attach() {
-  //   this.hostElement.insertAdjacentElement("beforeend", this.element);
-  // }
 }
 
 const activeProjectsList = new ProjectsList("active");
